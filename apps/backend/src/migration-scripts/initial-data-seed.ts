@@ -34,7 +34,10 @@ export default async function initial_data_seed({
     ModuleRegistrationName.FULFILLMENT
   );
 
-  const countries = ["gb", "de", "dk", "se", "fr", "es", "it"];
+  const countries = ["gb", "de", "dk", "se", "fr", "es", "it", "nl", "be", "at", "ch", "fi", "no", "ie", "pt", "tr", "bg", "ro", "gr", "rs", "hr", "ba", "me", "al", "mk", "si"];
+  const europeCountries = ["de", "dk", "se", "fr", "es", "it", "nl", "be", "at", "ch", "fi", "no", "ie", "pt", "bg", "ro", "gr", "rs", "hr", "ba", "me", "al", "mk", "si"];
+  const ukCountries = ["gb"];
+  const trCountries = ["tr"];
 
   logger.info("Seeding store data...");
   const {
@@ -87,6 +90,14 @@ export default async function initial_data_seed({
               currency_code: "usd",
               is_default: false,
             },
+            {
+              currency_code: "try",
+              is_default: false,
+            },
+            {
+              currency_code: "gbp",
+              is_default: false,
+            },
           ],
           default_sales_channel_id: defaultSalesChannel.id,
         },
@@ -101,7 +112,19 @@ export default async function initial_data_seed({
         {
           name: "Europe",
           currency_code: "eur",
-          countries,
+          countries: europeCountries,
+          payment_providers: ["pp_system_default"],
+        },
+        {
+          name: "United Kingdom",
+          currency_code: "gbp",
+          countries: ukCountries,
+          payment_providers: ["pp_system_default"],
+        },
+        {
+          name: "Turkey",
+          currency_code: "try",
+          countries: trCountries,
           payment_providers: ["pp_system_default"],
         },
       ],
@@ -161,36 +184,10 @@ export default async function initial_data_seed({
     service_zones: [
       {
         name: "Europe",
-        geo_zones: [
-          {
-            country_code: "gb",
-            type: "country",
-          },
-          {
-            country_code: "de",
-            type: "country",
-          },
-          {
-            country_code: "dk",
-            type: "country",
-          },
-          {
-            country_code: "se",
-            type: "country",
-          },
-          {
-            country_code: "fr",
-            type: "country",
-          },
-          {
-            country_code: "es",
-            type: "country",
-          },
-          {
-            country_code: "it",
-            type: "country",
-          },
-        ],
+        geo_zones: countries.map((country_code) => ({
+          country_code,
+          type: "country" as const,
+        })),
       },
     ],
   });
