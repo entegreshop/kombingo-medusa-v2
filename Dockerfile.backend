@@ -7,9 +7,9 @@ COPY . .
 RUN mv package.json package.json.bak || true
 
 WORKDIR /app/apps/backend
-RUN npm install --legacy-peer-deps
 
 EXPOSE 9000
 
-# Run build and start at runtime to bypass Docker build memory limits and hangs
-CMD ["sh", "-c", "npm run build && npm run start"]
+# Install, build, and start at runtime to completely bypass Docker build timeouts and limits.
+# We check if node_modules exists so we don't reinstall on simple restarts.
+CMD ["sh", "-c", "if [ ! -d node_modules ]; then npm install --legacy-peer-deps; fi && npm run build && npm run start"]

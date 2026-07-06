@@ -9,12 +9,9 @@ COPY . .
 RUN mv package.json package.json.bak || true
 
 WORKDIR /app/apps/storefront
-# Sleep for 90 seconds to let the backend npm install finish first. 
-# This prevents both Dockerfiles from running npm install simultaneously and crashing the VPS due to out-of-memory.
-RUN sleep 90 && npm install --legacy-peer-deps
 
 EXPOSE 8000
 
-# Run build and start AT RUNTIME. We sleep for 150 seconds to let the backend finish its build and start up first.
-# This prevents both containers from maxing out the VPS memory simultaneously.
-CMD ["sh", "-c", "echo 'Sleeping for 150s to let backend build first...' && sleep 150 && npm run build && npm run start"]
+# Install, build, and start AT RUNTIME. We sleep for 300 seconds to let the backend finish its massive install/build first.
+# We check if node_modules exists so we don't reinstall on simple restarts.
+CMD ["sh", "-c", "echo 'Sleeping for 300s to let backend install and build first...' && sleep 300 && if [ ! -d node_modules ]; then npm install --legacy-peer-deps; fi && npm run build && npm run start"]
