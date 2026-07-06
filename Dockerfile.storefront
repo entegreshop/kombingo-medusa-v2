@@ -1,24 +1,17 @@
-FROM node:20-alpine AS builder
+FROM node:20-alpine AS runner
 # Set working directory
 WORKDIR /app
 
-# Copy source code and build
+# Copy source code
 COPY . .
 
-# Disable root package.json to bypass npm workspace resolution bugs during deployment
+# Disable root package.json to bypass npm workspace resolution bugs
 RUN mv package.json package.json.bak || true
 
 WORKDIR /app/apps/storefront
 RUN npm install --legacy-peer-deps
-RUN npm run build
-
-FROM node:20-alpine AS runner
-WORKDIR /app/apps/storefront
-
-# Copy the standalone output and static files
-COPY --from=builder /app/apps/storefront/.next/standalone ./
-COPY --from=builder /app/apps/storefront/.next/static ./.next/static
-COPY --from=builder /app/apps/storefront/public ./public
 
 EXPOSE 8000
-CMD ["node", "server.js"]
+
+# Run build and start AT RUNTIME. This bypasses all Coolify Docker build phase restrictions (OOM, missing backend)
+CMD ["sh", "-c", "npm run build && npm run start"]
