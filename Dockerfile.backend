@@ -1,14 +1,15 @@
 FROM node:20-alpine AS builder
 # Set working directory
 WORKDIR /app
-# Install dependencies
-COPY package.json package-lock.json turbo.json ./
-COPY apps/backend/package.json ./apps/backend/
-RUN npm ci
-
 # Copy source code and build
 COPY . .
-RUN npx turbo run build --filter=@dtc/backend
+
+# Disable root package.json to bypass npm workspace resolution bugs during deployment
+RUN mv package.json package.json.bak || true
+
+WORKDIR /app/apps/backend
+RUN npm install --legacy-peer-deps
+RUN npm run build
 
 FROM node:20-alpine AS runner
 WORKDIR /app
