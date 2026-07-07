@@ -9,8 +9,7 @@ module.exports = defineConfig({
     backendUrl: process.env.MEDUSA_BACKEND_URL || "http://localhost:9000",
   },
   projectConfig: {
-    databaseUrl: process.env.DATABASE_URL + "?pool_timeout=60&connection_limit=40",
-    redisUrl: process.env.REDIS_URL,
+    databaseUrl: process.env.DATABASE_URL,
     http: {
       storeCors: process.env.STORE_CORS + ",https://www.kombingo.com,https://kombingo.com,http://localhost:8000",
       adminCors: process.env.ADMIN_CORS + ",https://www.kombingo.com,https://kombingo.com,https://kombingo-admin.vercel.app,https://kombingo-yonetim.vercel.app",
