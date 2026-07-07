@@ -45,7 +45,7 @@ export async function POST(
         categories.add(String(item.category_path))
       } else {
         // Try to construct from cat1name, cat2name etc.
-        const cats = []
+        const cats: string[] = []
         if (item.cat1name) cats.push(item.cat1name)
         if (item.cat2name) cats.push(item.cat2name)
         if (item.cat3name) cats.push(item.cat3name)

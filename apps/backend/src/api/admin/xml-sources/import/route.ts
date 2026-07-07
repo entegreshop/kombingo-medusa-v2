@@ -47,7 +47,7 @@ export async function POST(
       items = items.filter(item => {
         let itemCat = item.category_path
         if (!itemCat) {
-          const cats = []
+          const cats: string[] = []
           if (item.cat1name) cats.push(item.cat1name)
           if (item.cat2name) cats.push(item.cat2name)
           if (item.cat3name) cats.push(item.cat3name)
@@ -104,7 +104,7 @@ export async function POST(
       if (category_mappings && category_mappings.length > 0) {
         let itemCat = item.category_path
         if (!itemCat) {
-          const cats = []
+          const cats: string[] = []
           if (item.cat1name) cats.push(item.cat1name)
           if (item.cat2name) cats.push(item.cat2name)
           if (item.cat3name) cats.push(item.cat3name)
@@ -226,7 +226,7 @@ export async function POST(
         title: String(name),
         handle: handle,
         description: String(description),
-        status: "published",
+        status: "published" as any,
         images: images,
         categories: productCategories,
         metadata: {
