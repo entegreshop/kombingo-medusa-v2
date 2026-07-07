@@ -10,6 +10,7 @@ module.exports = defineConfig({
   },
   projectConfig: {
     databaseUrl: process.env.DATABASE_URL,
+    redisUrl: process.env.REDIS_URL,
     http: {
       storeCors: process.env.STORE_CORS + ",https://www.kombingo.com,https://kombingo.com,http://localhost:8000",
       adminCors: process.env.ADMIN_CORS + ",https://www.kombingo.com,https://kombingo.com,https://kombingo-admin.vercel.app,https://kombingo-yonetim.vercel.app",
