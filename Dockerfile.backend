@@ -1,15 +1,21 @@
-FROM node:20-alpine AS runner
+FROM node:20-alpine AS builder
 WORKDIR /app
 
 COPY . .
 
-# Disable root package.json to bypass npm workspace resolution bugs
-RUN mv package.json package.json.bak || true
+# Install dependencies and build
+RUN npm install --legacy-peer-deps
+RUN npx turbo run build --filter=@dtc/backend
+
+FROM node:20-alpine AS runner
+WORKDIR /app
+
+# Copy the built artifacts from the builder
+COPY --from=builder /app /app
 
 WORKDIR /app/apps/backend
 
 EXPOSE 9000
 
-# Install, build, and start at runtime to completely bypass Docker build timeouts and limits.
-# We check if node_modules exists so we don't reinstall on simple restarts.
-CMD ["sh", "-c", "if [ ! -d node_modules ]; then npm install --legacy-peer-deps; fi && npm run build && npm run start"]
+# Start the application
+CMD ["npm", "run", "start"]
