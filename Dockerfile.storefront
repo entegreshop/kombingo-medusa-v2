@@ -12,6 +12,6 @@ WORKDIR /app/apps/storefront
 
 EXPOSE 8000
 
-# Install, build, and start AT RUNTIME. We wait for the backend to fully start before doing anything.
-# This ensures we never run npm install or npm run build simultaneously, saving the VPS RAM.
-CMD ["sh", "-c", "echo 'Waiting for backend to become ready...' && while ! wget -qO- http://backend:9000/health > /dev/null 2>&1; do sleep 5; done && echo 'Backend is ready! Starting storefront setup...' && if [ ! -d node_modules ]; then npm install --legacy-peer-deps; fi && npm run build && npm run start"]
+# Install, build, and start AT RUNTIME. We wait for the backend port 9000 to open.
+# This prevents Next.js build from crashing if the backend isn't ready.
+CMD ["sh", "-c", "echo 'Waiting for backend on port 9000...' && node -e \"const net=require('net'); const check=()=>{const s=new net.Socket();s.connect(9000,'backend',()=>{s.destroy();process.exit(0);});s.on('error',()=>setTimeout(check,5000));};check();\" && echo 'Backend is ready!' && if [ ! -d node_modules ]; then npm install --legacy-peer-deps; fi && npm run build && npm run start"]
