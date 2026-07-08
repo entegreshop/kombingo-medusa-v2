@@ -17,6 +17,7 @@ RUN npm install --legacy-peer-deps
 COPY . .
 
 # Build the storefront
+ENV NODE_OPTIONS="--max-old-space-size=1536"
 RUN npx turbo run build --filter=medusa-next
 
 FROM node:20-alpine AS runner
