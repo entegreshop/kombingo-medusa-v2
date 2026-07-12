@@ -10,6 +10,7 @@ module.exports = defineConfig({
   },
   projectConfig: {
     databaseUrl: process.env.DATABASE_URL,
+    redisUrl: process.env.REDIS_URL,
     databaseDriverOptions: {
       pool: {
         min: 2,
@@ -19,9 +20,9 @@ module.exports = defineConfig({
       },
     },
     http: {
-      storeCors: process.env.STORE_CORS + ",https://www.kombingo.com,https://kombingo.com,http://localhost:8000",
-      adminCors: process.env.ADMIN_CORS + ",https://www.kombingo.com,https://kombingo.com,https://kombingo-admin.vercel.app,https://kombingo-yonetim.vercel.app",
-      authCors: process.env.AUTH_CORS + ",https://www.kombingo.com,https://kombingo.com,https://kombingo-admin.vercel.app,https://kombingo-yonetim.vercel.app",
+      storeCors: process.env.STORE_CORS || "https://bodykitmerkezi.com,https://www.bodykitmerkezi.com,http://localhost:8000",
+      adminCors: process.env.ADMIN_CORS || "https://api.bodykitmerkezi.com,http://localhost:9000",
+      authCors: process.env.AUTH_CORS || "https://api.bodykitmerkezi.com,http://localhost:9000",
       jwtSecret: process.env.JWT_SECRET || "supersecret",
       cookieSecret: process.env.COOKIE_SECRET || "supersecret",
     }
