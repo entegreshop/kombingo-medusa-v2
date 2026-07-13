@@ -1,16 +1,16 @@
 FROM node:20-slim AS runner
-WORKDIR /app
 
+WORKDIR /app
 COPY . .
 
-# Disable root package.json to bypass npm workspace resolution bugs
-RUN mv package.json package.json.bak || true
+# 1. Proje yapısını bozmadan tüm ana bağımlılıkları kuruyoruz
+RUN npm install --legacy-peer-deps --include=dev
 
 WORKDIR /app/apps/backend
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+
+# 2. İnşaat işlemini sunucu açılırken değil, güvenli "Kurulum" aşamasında yapıyoruz!
+RUN npm run build
 
 EXPOSE 9000
-
-# Install and start in DEV mode to bypass production deadlocks and build errors
-# Limit Node memory to 2GB to prevent the Linux Kernel from silently killing the container (OOM)
-ENV NODE_OPTIONS="--max-old-space-size=4096"
-CMD ["sh", "-c", "if [ ! -d node_modules ]; then npm install --legacy-peer-deps; fi && npm run build && npm run start"]
+CMD ["npm", "run", "start"]
