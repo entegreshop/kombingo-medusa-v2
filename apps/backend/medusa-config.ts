@@ -7,6 +7,15 @@ module.exports = defineConfig({
     disable: false,
     path: (process.env.MEDUSA_ADMIN_PATH || "/app") as `/${string}`,
     backendUrl: process.env.MEDUSA_BACKEND_URL || "http://localhost:9000",
+    vite: (config) => {
+      return {
+        ...config,
+        server: {
+          ...config.server,
+          allowedHosts: true,
+        },
+      }
+    }
   },
   projectConfig: {
     databaseUrl: process.env.DATABASE_URL,
