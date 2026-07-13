@@ -6,14 +6,16 @@ COPY . .
 # Windows/Linux (İşletim sistemi) çakışmasını önlemek için kilit dosyasını siliyoruz
 RUN rm -f package-lock.json
 
-# 1. Proje yapısını bozmadan tüm ana bağımlılıkları Linux'a özel olarak kuruyoruz
+# 1. Proje yapısını bozmadan tüm ana bağımlılıkları kuruyoruz
 RUN npm install --legacy-peer-deps --include=dev
 
 WORKDIR /app/apps/backend
 ENV NODE_OPTIONS="--max-old-space-size=4096"
 
-# 2. İnşaat işlemini Linux derleyicileriyle güvenli "Kurulum" aşamasında yapıyoruz!
+# 2. İnşaat işlemini güvenli kurulum aşamasında yapıyoruz
 RUN npm run build
 
 EXPOSE 9000
-CMD ["npm", "run", "start"]
+
+# 3. Hatalı çalışan package.json komutunu es geçip DOĞRUDAN sunucuyu (0.0.0.0 üzerinden) başlatıyoruz!
+CMD ["npx", "medusa", "start", "-H", "0.0.0.0"]
