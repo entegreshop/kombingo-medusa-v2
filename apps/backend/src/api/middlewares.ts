@@ -7,7 +7,7 @@ export default defineMiddlewares({
       method: "USE",
       matcher: "/uploads/*",
       middlewares: [
-        express.static("uploads")
+        express.static(".")
       ],
     },
     {
