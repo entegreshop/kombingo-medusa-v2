@@ -1,0 +1,25 @@
+{
+  "nav": {
+    "menu": "Meni",
+    "search": "Pretraga",
+    "account": "Moj nalog",
+    "cart": "Korpa"
+  },
+  "hero": {
+    "title": "Dobrodošli u XOOX prodavnicu",
+    "subtitle": "Otkrijte našu novu kolekciju 2026, pokretanu Medusa V2 tehnologijom",
+    "cta": "Kupi odmah"
+  },
+  "products": {
+    "featured": "Izdvojeni proizvodi",
+    "empty": "Nema proizvoda u ovoj kategoriji",
+    "add_to_cart": "Dodaj u korpu",
+    "price": "Cena"
+  },
+  "cart": {
+    "title": "Vaša korpa",
+    "empty": "Vaša korpa je prazna",
+    "checkout": "Idi na plaćanje",
+    "subtotal": "Ukupno"
+  }
+}

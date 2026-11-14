@@ -1,0 +1,25 @@
+{
+  "nav": {
+    "menu": "Menü",
+    "search": "Ara",
+    "account": "Hesabım",
+    "cart": "Sepet"
+  },
+  "hero": {
+    "title": "XOOX Mağazasına Hoş Geldiniz",
+    "subtitle": "Medusa V2 altyapısıyla güçlendirilen yeni 2026 koleksiyonumuzu keşfedin",
+    "cta": "Şimdi Alışverişe Başla"
+  },
+  "products": {
+    "featured": "Öne Çıkan Ürünler",
+    "empty": "Bu kategoride ürün bulunamadı",
+    "add_to_cart": "Sepete Ekle",
+    "price": "Fiyat"
+  },
+  "cart": {
+    "title": "Sepetiniz",
+    "empty": "Sepetiniz henüz boş",
+    "checkout": "Ödemeye Geç",
+    "subtotal": "Ara Toplam"
+  }
+}

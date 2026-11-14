@@ -1,0 +1,25 @@
+{
+  "nav": {
+    "menu": "Meniu",
+    "search": "Căutare",
+    "account": "Contul meu",
+    "cart": "Coș"
+  },
+  "hero": {
+    "title": "Bun venit la magazinul XOOX",
+    "subtitle": "Descoperiți noua noastră colecție 2026, propulsată de Medusa V2",
+    "cta": "Cumpără acum"
+  },
+  "products": {
+    "featured": "Produse Recomandate",
+    "empty": "Nu există produse în această categorie",
+    "add_to_cart": "Adaugă în coș",
+    "price": "Preț"
+  },
+  "cart": {
+    "title": "Coșul tău",
+    "empty": "Coșul tău este gol",
+    "checkout": "Finalizează comanda",
+    "subtotal": "Subtotal"
+  }
+}

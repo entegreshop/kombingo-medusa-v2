@@ -1,0 +1,25 @@
+{
+  "nav": {
+    "menu": "Menü",
+    "search": "Suche",
+    "account": "Mein Konto",
+    "cart": "Warenkorb"
+  },
+  "hero": {
+    "title": "Willkommen im XOOX Store",
+    "subtitle": "Entdecken Sie unsere neue 2026-Kollektion, powered by Medusa V2",
+    "cta": "Jetzt einkaufen"
+  },
+  "products": {
+    "featured": "Beliebte Produkte",
+    "empty": "Keine Produkte in dieser Kategorie",
+    "add_to_cart": "In den Warenkorb",
+    "price": "Preis"
+  },
+  "cart": {
+    "title": "Ihr Warenkorb",
+    "empty": "Ihr Warenkorb ist leer",
+    "checkout": "Zur Kasse",
+    "subtotal": "Zwischensumme"
+  }
+}

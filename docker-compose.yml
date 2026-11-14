@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-medusa}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-medusa}
+      POSTGRES_DB: ${POSTGRES_DB:-medusa}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+
+  redis:
+    image: redis:alpine
+    restart: always
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgres://${POSTGRES_USER:-medusa}:${POSTGRES_PASSWORD:-medusa}@db:5432/${POSTGRES_DB:-medusa}
+      REDIS_URL: redis://redis:6379
+      STORE_CORS: ${SERVICE_URL_STOREFRONT}
+      ADMIN_CORS: ${SERVICE_URL_STOREFRONT}
+      AUTH_CORS: ${SERVICE_URL_STOREFRONT}
+      JWT_SECRET: ${JWT_SECRET:-supersecret}
+      COOKIE_SECRET: ${COOKIE_SECRET:-supersecret}
+      PORT: 9000
+    depends_on:
+      - db
+      - redis
+    restart: always
+
+  storefront:
+    build:
+      context: .
+      dockerfile: Dockerfile.storefront
+      args:
+        - NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=${NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY:-pk_123456789}
+    environment:
+      MEDUSA_BACKEND_URL: http://backend:9000
+      NEXT_PUBLIC_MEDUSA_BACKEND_URL: ${SERVICE_URL_BACKEND}
+      NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: ${NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY:-pk_123456789}
+      PORT: 8000
+    depends_on:
+      - backend
+    restart: always
+
+
+volumes:
+  postgres_data:

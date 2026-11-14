@@ -1,0 +1,46 @@
+FROM node:20-slim AS runner
+
+WORKDIR /app
+
+# 1. Önce sadece package.json ve package-lock.json dosyalarını kopyalıyoruz.
+# Böylece kaynak kod değiştiğinde Docker node_modules kurulumunu önbellekten (CACHED) 0 saniyede geçer!
+COPY package.json package-lock.json ./
+COPY apps/api/package.json ./apps/api/
+COPY apps/backend/package.json ./apps/backend/
+COPY apps/merchant-admin/package.json ./apps/merchant-admin/
+COPY apps/platform-admin/package.json ./apps/platform-admin/
+COPY apps/storefront/package.json ./apps/storefront/
+COPY apps/worker/package.json ./apps/worker/
+COPY packages/auth/package.json ./packages/auth/
+COPY packages/commerce-core/package.json ./packages/commerce-core/
+COPY packages/config/package.json ./packages/config/
+COPY packages/database/package.json ./packages/database/
+COPY packages/integrations/package.json ./packages/integrations/
+COPY packages/types/package.json ./packages/types/
+COPY packages/ui/package.json ./packages/ui/
+
+# 2. Mevcut package-lock.json ile bağımlılıkları kuruyoruz (npmmirror 504 zaman aşımı verirse otomatik olarak npmjs / yarnpkg yedeğine geçer)
+RUN npm config set fetch-retries 3 && \
+    npm config set fetch-retry-mintimeout 3000 && \
+    npm config set fetch-retry-maxtimeout 15000 && \
+    npm config set fetch-timeout 30000 && \
+    (npm config set registry https://registry.npmmirror.com && npm install --legacy-peer-deps --include=dev --no-audit --no-fund) || \
+    (npm config set registry https://registry.npmjs.org && npm install --legacy-peer-deps --include=dev --no-audit --no-fund) || \
+    (npm config set registry https://registry.yarnpkg.com && npm install --legacy-peer-deps --include=dev --no-audit --no-fund)
+
+# 3. Kaynak kodlarını kopyalıyoruz
+COPY . .
+
+WORKDIR /app/apps/backend
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+
+# 4. İnşaat işlemini güvenli kurulum aşamasında yapıyoruz
+RUN npm run build
+
+# 5. Medusa V2'nin "Admin panelini yanlış klasörde arama" hatasını (bug) çözmek için dosyaları kopyalıyoruz!
+RUN cp -r .medusa/server/public ./public || true
+
+EXPOSE 9000
+
+# 6. Hatalı db komutlarını es geçip DOĞRUDAN sunucuyu (0.0.0.0 üzerinden) başlatıyoruz!
+CMD ["npx", "medusa", "start", "-H", "0.0.0.0", "-p", "9000"]

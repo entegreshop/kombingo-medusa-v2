@@ -1,0 +1,25 @@
+{
+  "nav": {
+    "menu": "Menu",
+    "search": "Search",
+    "account": "Account",
+    "cart": "Cart"
+  },
+  "hero": {
+    "title": "Welcome to XOOX Store",
+    "subtitle": "Discover our new 2026 Collection powered by Medusa V2",
+    "cta": "Shop Now"
+  },
+  "products": {
+    "featured": "Featured Products",
+    "empty": "No products in this category",
+    "add_to_cart": "Add to Cart",
+    "price": "Price"
+  },
+  "cart": {
+    "title": "Your Cart",
+    "empty": "Your cart is empty",
+    "checkout": "Proceed to Checkout",
+    "subtotal": "Subtotal"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "nav": {
+    "menu": "Menu",
+    "search": "Rechercher",
+    "account": "Mon compte",
+    "cart": "Panier"
+  },
+  "hero": {
+    "title": "Bienvenue sur XOOX Store",
+    "subtitle": "Découvrez notre nouvelle collection 2026 propulsée par Medusa V2",
+    "cta": "Acheter maintenant"
+  },
+  "products": {
+    "featured": "Produits Vedettes",
+    "empty": "Aucun produit dans cette catégorie",
+    "add_to_cart": "Ajouter au Panier",
+    "price": "Prix"
+  },
+  "cart": {
+    "title": "Votre Panier",
+    "empty": "Votre panier est vide",
+    "checkout": "Passer à la caisse",
+    "subtotal": "Sous-total"
+  }
+}

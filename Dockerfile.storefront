@@ -1,0 +1,19 @@
+FROM node:20-alpine AS runner
+# Set working directory
+WORKDIR /app
+
+# Copy source code
+COPY . .
+
+# Disable root package.json to bypass npm workspace resolution bugs
+RUN mv package.json package.json.bak || true
+
+WORKDIR /app/apps/storefront
+
+EXPOSE 8000
+
+# Install and start in DEV mode to bypass build errors and see exact Next.js errors in the browser.
+# We MUST stagger the npm installs to prevent the server from running out of RAM (OOM).
+# Using a fixed 4-minute sleep instead of a TCP wait so the storefront always starts even if the backend crashes.
+# We bypass npm run build because it uses massive amounts of RAM and crashes on a 2GB limit.
+CMD ["sh", "-c", "echo 'Sleeping for 4 minutes to let backend finish npm install first...' && sleep 240 && echo 'Starting storefront setup!' && if [ ! -d node_modules ]; then npm install --legacy-peer-deps; fi && npx next dev -H 0.0.0.0 -p 8000"]
