@@ -758,7 +758,7 @@ const IkasProductsPage = () => {
     setLoading(true)
     try {
       const [productsRes, priceListsRes, categoriesRes, collectionsRes, inventoryItemsRes] = await Promise.all([
-        fetch("/admin/products?limit=3000&order=-created_at&fields=id,title,handle,status,metadata,description,thumbnail,images,collection_id,categories.id,categories.name,options.id,options.title,options.values.id,options.values.value,variants.id,variants.title,variants.sku,variants.barcode,variants.manage_inventory,variants.prices.amount,variants.prices.currency_code,variants.metadata,variants.inventory_items.inventory_item_id,variants.options.id,variants.options.value,variants.options.option_id").then(res => res.json()).catch(() => ({ products: [] })),
+        fetch("/admin/products?limit=3000&order=-created_at&fields=id,title,handle,status,metadata,description,thumbnail,*images,collection_id,categories.id,categories.name,options.id,options.title,options.values.id,options.values.value,variants.id,variants.title,variants.sku,variants.barcode,variants.manage_inventory,variants.prices.amount,variants.prices.currency_code,variants.metadata,variants.inventory_items.inventory_item_id,variants.options.id,variants.options.value,variants.options.option_id").then(res => res.json()).catch(() => ({ products: [] })),
         fetch("/admin/price-lists?fields=id,title,type,status,prices.id,prices.amount,prices.currency_code,prices.price_set.variant.id").then(res => res.json()).catch(() => ({ price_lists: [] })),
         fetch("/admin/product-categories?limit=500&fields=id,name,handle,description,is_active,rank,parent_category_id,parent_category.id,parent_category.name,metadata").then(res => res.json()).catch(() => ({ product_categories: [] })),
         fetch("/admin/collections").then(res => res.json()).catch(() => ({ collections: [] })),
@@ -989,17 +989,27 @@ const IkasProductsPage = () => {
     const sizeOpt = prod.options?.find((o: any) => o.title.toLowerCase() === "beden")
 
     // Set Images with variant color mapping
-    const prodImages = prod.images?.map((img: any) => {
-      const isVideo = isVideoUrl(img.url)
-      const matchingVariant = prod.variants?.find((v: any) => v.metadata?.image === img.url)
-      const colorVal = matchingVariant?.options?.find((o: any) => o.option_id === colorOpt?.id)?.value
-      return {
-        url: img.url,
-        filename: img.url.split("/").pop() || "",
-        type: isVideo ? "video" : "image" as const,
-        color: colorVal
-      }
-    }) || []
+    const prodImages = (prod.images || [])
+      .filter((img: any) => img && img.url)
+      .map((img: any) => {
+        const isVideo = isVideoUrl(img.url)
+        const matchingVariant = prod.variants?.find((v: any) => v.metadata?.image === img.url)
+        const colorVal = matchingVariant?.options?.find((o: any) => o.option_id === colorOpt?.id)?.value
+        return {
+          url: img.url,
+          filename: img.url.split("/").pop() || "",
+          type: isVideo ? "video" : "image" as const,
+          color: colorVal
+        }
+      })
+    if (prodImages.length === 0 && prod.thumbnail) {
+      prodImages.push({
+        url: prod.thumbnail,
+        filename: prod.thumbnail.split("/").pop() || "",
+        type: isVideoUrl(prod.thumbnail) ? "video" : "image" as const,
+        color: undefined
+      })
+    }
     setImages(prodImages)
     
     const colors = colorOpt?.values?.map((v: any) => typeof v === "string" ? v : v.value) || []

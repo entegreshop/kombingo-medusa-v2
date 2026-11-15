@@ -98,6 +98,27 @@ setTimeout(async () => {
     // 2. Bölgelere (Region) bagli olan ama aslinda silinmis olan (null dönen) ödeme yöntemlerinin kopmus baglantilarini sil
     await c.query(`DELETE FROM region_payment_provider WHERE payment_provider_id NOT IN (SELECT id FROM payment_provider)`).catch(() => {});
     await c.query(`DELETE FROM store_payment_provider WHERE payment_provider_id NOT IN (SELECT id FROM payment_provider)`).catch(() => {});
+
+    // 3. Düzenleme sırasında pasife düşen ürün görsellerini ve boşalan thumbnail alanlarını geri yükle
+    await c.query(`
+      UPDATE image
+      SET deleted_at = NULL
+      WHERE deleted_at IS NOT NULL
+        AND product_id IN (
+          SELECT id FROM product WHERE deleted_at IS NULL AND (thumbnail IS NULL OR thumbnail = '')
+        )
+    `).catch(() => {});
+    await c.query(`
+      UPDATE product p
+      SET thumbnail = sub.url
+      FROM (
+        SELECT DISTINCT ON (product_id) product_id, url
+        FROM image
+        WHERE deleted_at IS NULL AND url IS NOT NULL AND url <> ''
+        ORDER BY product_id, rank ASC, created_at ASC
+      ) sub
+      WHERE p.id = sub.product_id AND (p.thumbnail IS NULL OR p.thumbnail = '')
+    `).catch(() => {});
     
     await c.end();
     console.log('KOPMUS VERITABANI BAGLANTILARI TEMIZLENDI!');

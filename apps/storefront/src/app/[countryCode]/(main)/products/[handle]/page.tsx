@@ -120,6 +120,9 @@ function getImagesForVariant(
   selectedVariantId?: string
 ) {
   if (!product.images || product.images.length === 0) {
+    if (product.thumbnail) {
+      return [{ id: "thumb", url: product.thumbnail } as HttpTypes.StoreProductImage]
+    }
     return []
   }
 
