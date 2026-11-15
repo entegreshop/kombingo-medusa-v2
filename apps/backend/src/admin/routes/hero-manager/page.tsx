@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react"
 import { defineRouteConfig } from "@medusajs/admin-sdk"
 import { ComputerDesktop } from "@medusajs/icons"
+import { DesignStudio, StudioSectionKey } from "./design-studio"
 
 interface Category {
   name: string
@@ -141,7 +142,8 @@ const HeroManagerPage = () => {
   }, [])
 
   // Live Hero & Vitrin Config States (/admin/hero-config)
-  const [showLiveHeroCustomizer, setShowLiveHeroCustomizer] = useState(false)
+  const [showLiveHeroCustomizer, setShowLiveHeroCustomizer] = useState(true)
+  const [studioSection, setStudioSection] = useState<StudioSectionKey>("hero")
   const [tag, setTag] = useState("")
   const [title, setTitle] = useState("")
   const [subtitle, setSubtitle] = useState("")
@@ -361,56 +363,86 @@ const HeroManagerPage = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-[12px]">
                 <button
                   type="button"
-                  onClick={() => setShowLiveHeroCustomizer((v) => !v)}
+                  onClick={() => {
+                    setStudioSection("hero")
+                    setShowLiveHeroCustomizer(true)
+                  }}
                   className="p-[14px] rounded-[5px] border border-[#e6e6e6] bg-[#f8f9fb] hover:bg-[#eef4ff] hover:border-[#3d94fb] text-left text-[13px] font-semibold text-[#48465b] flex items-center gap-2.5 transition cursor-pointer"
                 >
-                  <span className="text-[16px]">🎨</span>
-                  <span>Renkler &amp; Görünüm Ayarları</span>
+                  <span className="text-[16px]">🎯</span>
+                  <span>Hero Banner &amp; Vitrin Ayarları</span>
                 </button>
 
                 <button
                   type="button"
-                  onClick={() => setShowLiveHeroCustomizer((v) => !v)}
-                  className="p-[14px] rounded-[5px] border border-[#e6e6e6] bg-[#f8f9fb] hover:bg-[#eef4ff] hover:border-[#3d94fb] text-left text-[13px] font-semibold text-[#48465b] flex items-center gap-2.5 transition cursor-pointer"
+                  onClick={() => {
+                    setStudioSection("coupon_popup")
+                    setShowLiveHeroCustomizer(true)
+                  }}
+                  className="p-[14px] rounded-[5px] border border-[#0abb87] bg-[#eefbf5] hover:bg-[#d7f5e8] text-left text-[13px] font-bold text-[#08976d] flex items-center gap-2.5 transition cursor-pointer"
                 >
-                  <span className="text-[16px]">🔤</span>
-                  <span>Yazı Tipleri (Fontlar)</span>
+                  <span className="text-[16px]">🎟️</span>
+                  <span>Hero Üstü Kupon &amp; Popup Ayarları</span>
                 </button>
 
                 <button
                   type="button"
-                  onClick={() => setShowLiveHeroCustomizer((v) => !v)}
+                  onClick={() => {
+                    setStudioSection("carousel")
+                    setShowLiveHeroCustomizer(true)
+                  }}
+                  className="p-[14px] rounded-[5px] border border-[#e6e6e6] bg-[#f8f9fb] hover:bg-[#eef4ff] hover:border-[#3d94fb] text-left text-[13px] font-semibold text-[#48465b] flex items-center gap-2.5 transition cursor-pointer"
+                >
+                  <span className="text-[16px]">🎠</span>
+                  <span>Ana Sayfa Carousel Blokları</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setStudioSection("header_footer")
+                    setShowLiveHeroCustomizer(true)
+                  }}
                   className="p-[14px] rounded-[5px] border border-[#e6e6e6] bg-[#f8f9fb] hover:bg-[#eef4ff] hover:border-[#3d94fb] text-left text-[13px] font-semibold text-[#48465b] flex items-center gap-2.5 transition cursor-pointer"
                 >
                   <span className="text-[16px]">🔝</span>
-                  <span>Üst Alan (Header) Tasarımı</span>
+                  <span>Header &amp; Footer Tasarımı</span>
                 </button>
 
                 <button
                   type="button"
-                  onClick={() => setShowLiveHeroCustomizer((v) => !v)}
+                  onClick={() => {
+                    setStudioSection("buttons")
+                    setShowLiveHeroCustomizer(true)
+                  }}
                   className="p-[14px] rounded-[5px] border border-[#e6e6e6] bg-[#f8f9fb] hover:bg-[#eef4ff] hover:border-[#3d94fb] text-left text-[13px] font-semibold text-[#48465b] flex items-center gap-2.5 transition cursor-pointer"
                 >
-                  <span className="text-[16px]">🔻</span>
-                  <span>Alt Alan (Footer) Tasarımı</span>
+                  <span className="text-[16px]">🔘</span>
+                  <span>Buton Tasarım &amp; Renk Ayarları</span>
                 </button>
 
                 <button
                   type="button"
-                  onClick={() => setShowLiveHeroCustomizer((v) => !v)}
+                  onClick={() => {
+                    setStudioSection("product_detail")
+                    setShowLiveHeroCustomizer(true)
+                  }}
                   className="p-[14px] rounded-[5px] border border-[#e6e6e6] bg-[#f8f9fb] hover:bg-[#eef4ff] hover:border-[#3d94fb] text-left text-[13px] font-semibold text-[#48465b] flex items-center gap-2.5 transition cursor-pointer"
                 >
-                  <span className="text-[16px]">🛍️</span>
-                  <span>Ürün Kartı &amp; Liste Görünümü</span>
+                  <span className="text-[16px]">👗</span>
+                  <span>Ürün Detay Tasarım &amp; Ayarlar</span>
                 </button>
 
                 <button
                   type="button"
-                  onClick={() => setShowLiveHeroCustomizer((v) => !v)}
+                  onClick={() => {
+                    setStudioSection("checkout")
+                    setShowLiveHeroCustomizer(true)
+                  }}
                   className="p-[14px] rounded-[5px] border border-[#e6e6e6] bg-[#f8f9fb] hover:bg-[#eef4ff] hover:border-[#3d94fb] text-left text-[13px] font-semibold text-[#48465b] flex items-center gap-2.5 transition cursor-pointer"
                 >
-                  <span className="text-[16px]">&lt;/&gt;</span>
-                  <span>Özel CSS / JS Düzenleyici</span>
+                  <span className="text-[16px]">💳</span>
+                  <span>Sepet &amp; Ödeme Formu Tasarımı</span>
                 </button>
               </div>
             </div>
@@ -447,80 +479,7 @@ const HeroManagerPage = () => {
             </div>
           </div>
 
-          {showLiveHeroCustomizer && (
-            <form onSubmit={handleSaveHeroConfig} className="bg-white rounded-[8px] border border-[#3d94fb] p-[25px] mb-[30px] shadow-2xs space-y-5">
-              <div className="flex items-center justify-between pb-3 border-b border-[#ebedf2]">
-                <div>
-                  <h4 className="text-[16px] font-bold text-[#48465b]">Canlı Vitrin, Kayan Yazı &amp; Satın Alma Butonları Özelleştirme</h4>
-                  <p className="text-[12.5px] text-[#74788d]">Değişiklikleriniz canlı mağaza vitrinine (/admin/hero-config) anında yansır.</p>
-                </div>
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="h-[36px] px-5 rounded-[4px] bg-[#0abb87] text-white text-[13px] font-semibold cursor-pointer"
-                >
-                  {saving ? "Kaydediliyor..." : "✓ Değişiklikleri Kaydet"}
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-[12.5px] font-semibold text-[#48465b] mb-1">1. Tepe Duyuru Metni</label>
-                  <input
-                    type="text"
-                    value={topAnnouncement}
-                    onChange={(e) => setTopAnnouncement(e.target.value)}
-                    className="w-full h-[36px] px-3 rounded-[4px] border border-[#e2e5ec] text-[13px]"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[12.5px] font-semibold text-[#48465b] mb-1">2. Ana Sayfa Kayan Yazı</label>
-                  <input
-                    type="text"
-                    value={scrollingTextHome}
-                    onChange={(e) => setScrollingTextHome(e.target.value)}
-                    className="w-full h-[36px] px-3 rounded-[4px] border border-[#e2e5ec] text-[13px]"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[12.5px] font-semibold text-[#48465b] mb-1">3. Ürün Detay Kayan Yazı</label>
-                  <input
-                    type="text"
-                    value={scrollingTextProduct}
-                    onChange={(e) => setScrollingTextProduct(e.target.value)}
-                    className="w-full h-[36px] px-3 rounded-[4px] border border-[#e2e5ec] text-[13px]"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[12.5px] font-semibold text-[#48465b] mb-1">Hemen Al Butonu Rengi</label>
-                  <input
-                    type="text"
-                    value={buyNowBg}
-                    onChange={(e) => setBuyNowBg(e.target.value)}
-                    className="w-full h-[36px] px-3 rounded-[4px] border border-[#e2e5ec] text-[13px] font-mono"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[12.5px] font-semibold text-[#48465b] mb-1">Sepete Ekle Butonu Rengi</label>
-                  <input
-                    type="text"
-                    value={addToCartBg}
-                    onChange={(e) => setAddToCartBg(e.target.value)}
-                    className="w-full h-[36px] px-3 rounded-[4px] border border-[#e2e5ec] text-[13px] font-mono"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[12.5px] font-semibold text-[#48465b] mb-1">WhatsApp Sipariş Hattı</label>
-                  <input
-                    type="text"
-                    value={whatsappNumber}
-                    onChange={(e) => setWhatsappNumber(e.target.value)}
-                    className="w-full h-[36px] px-3 rounded-[4px] border border-[#e2e5ec] text-[13px] font-mono"
-                  />
-                </div>
-              </div>
-            </form>
-          )}
+          <DesignStudio initialSection={studioSection} onToast={setToastMessage} />
 
           {/* .theme-list-v2 */}
           <h3 className="text-[16px] font-bold text-[#48465b] mb-4">Hazır Tema Kütüphanesi</h3>
@@ -595,6 +554,7 @@ const HeroManagerPage = () => {
       {/* 2. BLOK YÖNETİMİ (/admin/store/modules - .pattern-modules & .pattern-module-groups) */}
       {activeTab === "modules" && (
         <div id="subview-theme-modules" className="theme-subview max-w-[1260px] w-full mx-auto px-5 py-7">
+          <DesignStudio initialSection="carousel" onToast={setToastMessage} />
           <div className="bg-white rounded-[6px] border border-[#ebedf2] p-[25px] shadow-2xs">
             <div className="flex flex-wrap items-center justify-between gap-4 pb-5 mb-6 border-b border-[#ebedf2]">
               <div>
@@ -1481,237 +1441,22 @@ const HeroManagerPage = () => {
 
       {/* 13. MANŞETLER (/admin/store/headlines - headlineSort) */}
       {activeTab === "headlines" && (
-        <div id="subview-theme-headlines" className="theme-subview max-w-[1140px] w-full mx-auto px-5 py-7">
-          <div className="bg-white rounded-[4px] border border-[#ebedf2] p-[25px] shadow-2xs">
-            <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
-              <div>
-                <h3 className="text-[18px] font-medium text-[#48465b]">Manşetler (Ana Sayfa Slider Yönetimi)</h3>
-                <p className="text-[13px] text-[#74788d] mt-1">
-                  Masaüstü ve mobil cihazlar için ayrı görseller tanımlayabilir, sürükle-bırak ile manşet sırasını değiştirebilirsiniz.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowLiveHeroCustomizer((v) => !v)}
-                className="h-[38px] px-4 rounded-[4px] bg-[#0abb87] text-white text-[13px] font-medium cursor-pointer"
-              >
-                + Yeni Manşet Ekle / Hero Düzenle
-              </button>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div className="border border-[#ebedf2] rounded-[6px] p-4 bg-[#fafbfe] flex items-center gap-4">
-                <img src={mediaUrl || PREVIEW_IMG_1} alt="Manşet 1" className="w-28 h-20 object-cover rounded border border-slate-200 shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <div className="text-[14px] font-bold text-[#1e293b] truncate">
-                    {title || "Yeni Sezon Koleksiyonu — %30'a Varan İndirim"}
-                  </div>
-                  <div className="text-[12px] text-[#3d94fb] font-mono mt-0.5">{btnLink || "/kampanyalar"}</div>
-                  <div className="flex items-center gap-2 mt-2">
-                    <span className="px-2 py-0.5 rounded bg-[#e0f6e7] text-[#08976d] text-[11px] font-bold">✓ Aktif</span>
-                    <span className="text-[11.5px] text-slate-500">Sıra: 1</span>
-                  </div>
-                </div>
-                <div className="flex flex-col gap-1">
-                  <button
-                    type="button"
-                    onClick={() => setShowLiveHeroCustomizer((v) => !v)}
-                    className="w-[28px] h-[28px] rounded bg-[#9b59b6] text-white text-[12px] cursor-pointer"
-                  >
-                    ✎
-                  </button>
-                  <button type="button" className="w-[28px] h-[28px] rounded bg-[#e74c3c] text-white text-[12px] cursor-pointer">
-                    🗑
-                  </button>
-                </div>
-              </div>
-
-              <div className="border border-[#ebedf2] rounded-[6px] p-4 bg-[#fafbfe] flex items-center gap-4">
-                <img src={PREVIEW_IMG_2} alt="Manşet 2" className="w-28 h-20 object-cover rounded border border-slate-200 shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <div className="text-[14px] font-bold text-[#1e293b] truncate">1.000 TL ve Üzeri Siparişlerde Ücretsiz Kargo</div>
-                  <div className="text-[12px] text-[#3d94fb] font-mono mt-0.5">/yeni-urunler</div>
-                  <div className="flex items-center gap-2 mt-2">
-                    <span className="px-2 py-0.5 rounded bg-[#e0f6e7] text-[#08976d] text-[11px] font-bold">✓ Aktif</span>
-                    <span className="text-[11.5px] text-slate-500">Sıra: 2</span>
-                  </div>
-                </div>
-                <div className="flex flex-col gap-1">
-                  <button
-                    type="button"
-                    onClick={() => setShowLiveHeroCustomizer((v) => !v)}
-                    className="w-[28px] h-[28px] rounded bg-[#9b59b6] text-white text-[12px] cursor-pointer"
-                  >
-                    ✎
-                  </button>
-                  <button type="button" className="w-[28px] h-[28px] rounded bg-[#e74c3c] text-white text-[12px] cursor-pointer">
-                    🗑
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {showLiveHeroCustomizer && (
-              <form onSubmit={handleSaveHeroConfig} className="mt-6 pt-5 border-t border-[#ebedf2] space-y-4">
-                <h4 className="text-[15px] font-bold text-[#48465b]">Canlı Hero Manşet İçeriği (/admin/hero-config)</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-[12.5px] font-semibold text-[#48465b] mb-1">Üst Etiket (Tag)</label>
-                    <input
-                      type="text"
-                      value={tag}
-                      onChange={(e) => setTag(e.target.value)}
-                      className="w-full h-[36px] px-3 rounded-[4px] border border-[#e2e5ec] text-[13px]"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[12.5px] font-semibold text-[#48465b] mb-1">Ana Başlık (Title)</label>
-                    <input
-                      type="text"
-                      value={title}
-                      onChange={(e) => setTitle(e.target.value)}
-                      className="w-full h-[36px] px-3 rounded-[4px] border border-[#e2e5ec] text-[13px]"
-                    />
-                  </div>
-                  <div className="md:col-span-2">
-                    <label className="block text-[12.5px] font-semibold text-[#48465b] mb-1">Alt Başlık (Subtitle)</label>
-                    <input
-                      type="text"
-                      value={subtitle}
-                      onChange={(e) => setSubtitle(e.target.value)}
-                      className="w-full h-[36px] px-3 rounded-[4px] border border-[#e2e5ec] text-[13px]"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[12.5px] font-semibold text-[#48465b] mb-1">Buton Yazısı</label>
-                    <input
-                      type="text"
-                      value={btnText}
-                      onChange={(e) => setBtnText(e.target.value)}
-                      className="w-full h-[36px] px-3 rounded-[4px] border border-[#e2e5ec] text-[13px]"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[12.5px] font-semibold text-[#48465b] mb-1">Buton Linki</label>
-                    <input
-                      type="text"
-                      value={btnLink}
-                      onChange={(e) => setBtnLink(e.target.value)}
-                      className="w-full h-[36px] px-3 rounded-[4px] border border-[#e2e5ec] text-[13px]"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[12.5px] font-semibold text-[#48465b] mb-1">Arka Plan Görsel/Video URL</label>
-                    <input
-                      type="text"
-                      value={mediaUrl}
-                      onChange={(e) => setMediaUrl(e.target.value)}
-                      className="w-full h-[36px] px-3 rounded-[4px] border border-[#e2e5ec] text-[13px]"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[12.5px] font-semibold text-[#48465b] mb-1">Bilgisayardan Yükle</label>
-                    <input
-                      type="file"
-                      accept="image/*,video/mp4"
-                      onChange={(e) => handleHeroFileUpload(e, "hero")}
-                      className="w-full text-[12.5px]"
-                    />
-                  </div>
-                </div>
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="h-[36px] px-5 rounded-[4px] bg-[#0abb87] text-white text-[13px] font-semibold cursor-pointer"
-                >
-                  {saving ? "Kaydediliyor..." : "✓ Manşet Ayarlarını Kaydet"}
-                </button>
-              </form>
-            )}
-          </div>
+        <div id="subview-theme-headlines" className="theme-subview max-w-[1260px] w-full mx-auto px-5 py-7">
+          <DesignStudio initialSection="hero" onToast={setToastMessage} />
         </div>
       )}
 
       {/* 14. BANNERLAR (/admin/store/banners - bannersTable) */}
       {activeTab === "banners" && (
-        <div id="subview-theme-banners" className="theme-subview max-w-[1140px] w-full mx-auto px-5 py-7">
-          <div className="bg-white rounded-[4px] border border-[#ebedf2] p-[25px] shadow-2xs">
-            <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
-              <div>
-                <h3 className="text-[18px] font-medium text-[#48465b]">Bannerlar (Vitrin &amp; Kampanya Görsel Grupları)</h3>
-                <p className="text-[13px] text-[#74788d] mt-1">
-                  Blok yönetiminde kullandığınız 2'li, 3'lü veya tam genişlikteki görsel banner gruplarını yönetebilirsiniz.
-                </p>
-              </div>
-              <button type="button" className="h-[38px] px-4 rounded-[4px] bg-[#0abb87] text-white text-[13px] font-medium cursor-pointer">
-                + Yeni Banner Grubu
-              </button>
-            </div>
-            <table className="w-full text-left border-collapse text-[13px]">
-              <thead>
-                <tr className="bg-[#f8f9fb] border-b border-[#ebedf2] text-[#48465b] font-semibold">
-                  <th className="py-3 px-3 w-[40px] text-center">
-                    <input type="checkbox" className="w-4 h-4" />
-                  </th>
-                  <th className="py-3 px-3 w-[80px]">No</th>
-                  <th className="py-3 px-3">Banner Adı</th>
-                  <th className="py-3 px-3 w-[110px] text-right">İşlemler</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#ebedf2] text-[#48465b]">
-                <tr>
-                  <td className="py-3 px-3 text-center">
-                    <input type="checkbox" className="w-4 h-4" />
-                  </td>
-                  <td className="py-3 px-3">1</td>
-                  <td className="py-3 px-3 font-semibold">Ana Sayfa Üst 3'lü Kategori Vitrin Bannerları</td>
-                  <td className="py-3 px-3 text-right">
-                    <button type="button" className="w-[28px] h-[28px] rounded bg-[#9b59b6] text-white">
-                      👁
-                    </button>{" "}
-                    <button type="button" className="w-[28px] h-[28px] rounded bg-[#e74c3c] text-white">
-                      🗑
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <td className="py-3 px-3 text-center">
-                    <input type="checkbox" className="w-4 h-4" />
-                  </td>
-                  <td className="py-3 px-3">2</td>
-                  <td className="py-3 px-3 font-semibold">Ana Sayfa Orta Geniş Kampanya &amp; Kargo Bannerı</td>
-                  <td className="py-3 px-3 text-right">
-                    <button type="button" className="w-[28px] h-[28px] rounded bg-[#9b59b6] text-white">
-                      👁
-                    </button>{" "}
-                    <button type="button" className="w-[28px] h-[28px] rounded bg-[#e74c3c] text-white">
-                      🗑
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <td className="py-3 px-3 text-center">
-                    <input type="checkbox" className="w-4 h-4" />
-                  </td>
-                  <td className="py-3 px-3">3</td>
-                  <td className="py-3 px-3 font-semibold">Mobil Uygulama &amp; WhatsApp Sipariş Hattı Bannerı</td>
-                  <td className="py-3 px-3 text-right">
-                    <button type="button" className="w-[28px] h-[28px] rounded bg-[#9b59b6] text-white">
-                      👁
-                    </button>{" "}
-                    <button type="button" className="w-[28px] h-[28px] rounded bg-[#e74c3c] text-white">
-                      🗑
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+        <div id="subview-theme-banners" className="theme-subview max-w-[1260px] w-full mx-auto px-5 py-7">
+          <DesignStudio initialSection="vitrin" onToast={setToastMessage} />
         </div>
       )}
 
       {/* 15. POPUP (/admin/store/popup - popupsTable) */}
       {activeTab === "popup" && (
-        <div id="subview-theme-popup" className="theme-subview max-w-[1140px] w-full mx-auto px-5 py-7">
+        <div id="subview-theme-popup" className="theme-subview max-w-[1260px] w-full mx-auto px-5 py-7">
+          <DesignStudio initialSection="coupon_popup" onToast={setToastMessage} />
           <div className="bg-white rounded-[4px] border border-[#ebedf2] p-[25px] shadow-2xs">
             <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
               <div>

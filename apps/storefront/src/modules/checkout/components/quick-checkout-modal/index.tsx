@@ -70,6 +70,23 @@ export default function QuickCheckoutModal({
   const ARAS_BASE64 = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iNDAiPjx0ZXh0IHg9IjEwIiB5PSIyNSIgZmlsbD0iIzEzMkI1QiIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjIyIiBmb250LXdlaWdodD0iYm9sZCI+QVJBUzwvdGV4dD48L3N2Zz4=";
   const [arasLogoUrl, setArasLogoUrl] = useState(ARAS_BASE64);
   const [storeLogoUrl, setStoreLogoUrl] = useState("/logo.png");
+  const [checkoutConfig, setCheckoutConfig] = useState({
+    modal_title: "Hızlı ve Güvenli Ödeme",
+    delivery_section_title: "Teslimat Adresi",
+    payment_section_title: "Ödeme",
+    accent_color: "#111827",
+    submit_btn_text: "Siparişi Tamamla",
+    submit_btn_bg: "#1A1A1A",
+    submit_btn_text_color: "#ffffff",
+    show_email: true,
+    require_email: true,
+    show_order_note: true,
+    show_coupon: true,
+    show_invoice_type: true,
+    default_payment_method: "credit_card",
+    ssl_badge_text: "Tüm bilgileriniz 256bit SSL Sertifikası ile korunmaktadır.",
+    copyright_text: `© ${new Date().getFullYear()} Kombingo Tüm Hakları Saklıdır`,
+  });
 
   // Popup açma fonksiyonu
   const openPopup = (e: React.MouseEvent<HTMLAnchorElement>, url: string) => {
@@ -132,6 +149,31 @@ export default function QuickCheckoutModal({
        const fetchOptions = {
           headers: { "x-publishable-api-key": PUBLISHABLE_KEY }
        };
+
+       try {
+          const savedCoupon = window.localStorage.getItem("kombingo_active_coupon")
+          if (savedCoupon) {
+             setFormData(prev => ({ ...prev, coupon: prev.coupon || savedCoupon }))
+          }
+       } catch {}
+
+       fetch(`${MEDUSA_URL}/store/hero-config`, fetchOptions)
+          .then(res => res.json())
+          .then(data => {
+             if (data?.config?.checkout_settings) {
+                setCheckoutConfig(prev => ({ ...prev, ...data.config.checkout_settings }))
+                if (data.config.checkout_settings.default_payment_method) {
+                   setFormData(prev => ({ ...prev, payment_method: data.config.checkout_settings.default_payment_method }))
+                }
+             }
+          }).catch(() => {})
+
+       fetch(`${MEDUSA_URL}/store/logo-config`, fetchOptions)
+          .then(res => res.json())
+          .then(data => {
+             const logo = data?.config?.checkoutLogo || data?.config?.headerLogo || data?.config?.logo
+             if (logo) setStoreLogoUrl(logo)
+          }).catch(() => {})
 
        fetch(`${MEDUSA_URL}/store/custom/payment-cod`, fetchOptions)
           .then(res => res.json())
@@ -399,13 +441,17 @@ export default function QuickCheckoutModal({
 
             {/* Teslimat Adresi (Heading block) */}
             <div className="pt-0">
-               <h2 className="text-2xl font-bold mb-6">Teslimat Adresi</h2>
+               <h2 className="text-2xl font-bold mb-6">{checkoutConfig.delivery_section_title || "Teslimat Adresi"}</h2>
                
                {/* Iletisim Bilgileri */}
-               <h3 className="text-base font-bold mb-3">İletişim Bilgileri</h3>
-               <div className="mb-6">
-                 <input type="email" name="email" required placeholder="E-posta" className="w-full border border-gray-300 rounded-md p-3.5 text-sm focus:border-black focus:ring-1 focus:ring-black outline-none" value={formData.email} onChange={handleInputChange} />
-               </div>
+               {checkoutConfig.show_email !== false && (
+                 <>
+                   <h3 className="text-base font-bold mb-3">İletişim Bilgileri</h3>
+                   <div className="mb-6">
+                     <input type="email" name="email" required={checkoutConfig.require_email !== false} placeholder="E-posta" className="w-full border border-gray-300 rounded-md p-3.5 text-sm focus:border-black focus:ring-1 focus:ring-black outline-none" value={formData.email} onChange={handleInputChange} />
+                   </div>
+                 </>
+               )}
 
                {/* Teslimat Adresi Form */}
                <h3 className="text-base font-bold mb-3">Teslimat Adresi</h3>
@@ -423,7 +469,9 @@ export default function QuickCheckoutModal({
                   </div>
                   
                   <input required type="text" name="address" placeholder="Adres" className="w-full border border-gray-300 rounded-md p-3.5 text-sm focus:border-black focus:ring-1 focus:ring-black outline-none" value={formData.address} onChange={handleInputChange} />
-                  <input type="text" name="order_note" placeholder="Apartman, daire, vb. (İsteğe Bağlı)" className="w-full border border-gray-300 rounded-md p-3.5 text-sm focus:border-black focus:ring-1 focus:ring-black outline-none" value={formData.order_note} onChange={handleInputChange} />
+                  {checkoutConfig.show_order_note !== false && (
+                    <input type="text" name="order_note" placeholder="Apartman, daire, vb. (İsteğe Bağlı)" className="w-full border border-gray-300 rounded-md p-3.5 text-sm focus:border-black focus:ring-1 focus:ring-black outline-none" value={formData.order_note} onChange={handleInputChange} />
+                  )}
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                      <div className="relative">
@@ -459,6 +507,7 @@ export default function QuickCheckoutModal({
             </div>
 
             {/* Fatura Bilgileri (E-Fatura Entegrasyonu) */}
+            {checkoutConfig.show_invoice_type !== false && (
             <div className="pt-2">
                <h2 className="text-2xl font-bold mb-6">Fatura Bilgileri</h2>
                
@@ -492,6 +541,7 @@ export default function QuickCheckoutModal({
                    )}
                </div>
             </div>
+            )}
 
             {/* Kargo Yöntemi */}
             <div className="pt-2">
@@ -518,7 +568,7 @@ export default function QuickCheckoutModal({
 
             {/* Odeme Yontemi */}
             <div className="pt-2">
-              <h2 className="text-2xl font-bold mb-6">Ödeme</h2>
+              <h2 className="text-2xl font-bold mb-6">{checkoutConfig.payment_section_title || "Ödeme"}</h2>
               <div className="space-y-4">
                  {["cash_on_delivery:Kapıda Nakit Ödeme", "cod_cc:Kapıda Kredi Kartı ile Ödeme", "havale:Havale / EFT", "credit_card:Kredi / Banka Kartı (PayTR)"].map(m => {
                     const [val, label] = m.split(":")
@@ -674,6 +724,7 @@ export default function QuickCheckoutModal({
                      </div>
 
                      {/* KUPON ALANI */}
+                     {checkoutConfig.show_coupon !== false && (
                      <div className="pt-2 px-1">
                         <div className="flex flex-col gap-y-2">
                            {formData.coupon ? (
@@ -688,6 +739,7 @@ export default function QuickCheckoutModal({
                            )}
                         </div>
                      </div>
+                     )}
                   </div>
                </div>
             </div>
@@ -705,19 +757,32 @@ export default function QuickCheckoutModal({
             </div>
 
             {/* Siparis Tamamla Butonu */}
-            <button form="quick-checkout" type="submit" disabled={loading} className="w-full bg-[#1A1A1A] hover:bg-black text-white py-4 rounded-md font-bold text-base flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            <button
+               form="quick-checkout"
+               type="submit"
+               disabled={loading}
+               className="w-full py-4 rounded-md font-bold text-base flex items-center justify-center transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+               style={{
+                  backgroundColor: checkoutConfig.submit_btn_bg || "#1A1A1A",
+                  color: checkoutConfig.submit_btn_text_color || "#ffffff",
+               }}
+            >
                {loading ? (
                   <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
                ) : (
-                  "Siparişi Tamamla"
+                  checkoutConfig.submit_btn_text || "Siparişi Tamamla"
                )}
             </button>
             
             {/* Footer Area */}
             <div className="pt-10 pb-8 flex flex-col items-center justify-center space-y-4">
                <div className="text-center space-y-1">
-                  <p className="text-[12.5px] text-[#8c8c8c] font-medium tracking-wide">Tüm bilgileriniz 256bit SSL Sertifikası ile korunmaktadır.</p>
-                  <p className="text-[12.5px] text-[#8c8c8c] font-medium tracking-wide">© {new Date().getFullYear()} Kombingo.com Tüm Hakları Saklıdır</p>
+                  <p className="text-[12.5px] text-[#8c8c8c] font-medium tracking-wide">
+                     {checkoutConfig.ssl_badge_text || "Tüm bilgileriniz 256bit SSL Sertifikası ile korunmaktadır."}
+                  </p>
+                  <p className="text-[12.5px] text-[#8c8c8c] font-medium tracking-wide">
+                     {checkoutConfig.copyright_text || `© ${new Date().getFullYear()} Kombingo Tüm Hakları Saklıdır`}
+                  </p>
                </div>
                <div className="flex items-center gap-x-3 mt-4 w-full justify-center">
                   <div className="w-[50px] h-[32px] border border-gray-200 rounded flex items-center justify-center bg-white shadow-[0_1px_2px_rgba(0,0,0,0.02)] px-1.5">

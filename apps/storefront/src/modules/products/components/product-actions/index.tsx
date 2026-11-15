@@ -66,15 +66,35 @@ export default function ProductActions({
   // Button settings state
   const [btnConfig, setBtnConfig] = useState({
     buy_now_enabled: true,
+    buy_now_text: "HEMEN AL",
     buy_now_bg: "#E50000",
     buy_now_text_color: "#ffffff",
     add_to_cart_enabled: true,
+    add_to_cart_text: "SEPETE EKLE",
     add_to_cart_bg: "#000000",
     add_to_cart_text_color: "#ffffff",
     whatsapp_enabled: true,
+    whatsapp_text: "WHATSAPP İLE SİPARİŞ",
     whatsapp_number: "905323370081",
     whatsapp_bg: "#ffffff",
     whatsapp_text_color: "#25D366",
+    button_border_radius: "0px",
+  })
+
+  const [detailConfig, setDetailConfig] = useState({
+    show_live_viewers: true,
+    live_viewers_min: 12,
+    live_viewers_max: 34,
+    show_favorite_button: true,
+    show_reviews_link: true,
+    show_trust_row: true,
+    trust_badge_1_text: "Güvenli Ödeme",
+    trust_badge_2_text: "Aynı Gün Kargo",
+    shipping_info_text:
+      "Saat 15:00'a kadar verilen tüm siparişleriniz aynı gün kargoya teslim edilmektedir. Teslimat süresi ortalama 1-3 iş günüdür.",
+    return_policy_text:
+      "Siparişinizdeki ürünleri teslim aldığınız tarihten itibaren 14 gün içerisinde, kullanılmamış ve etiketleri sökülmemiş olması şartıyla iade edebilirsiniz.",
+    show_sticky_mobile_bar: true,
   })
 
   const [showCouponModal, setShowCouponModal] = useState(false)
@@ -136,7 +156,7 @@ export default function ProductActions({
   useEffect(() => {
     const fetchConfig = async () => {
       try {
-        const backendUrl = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
+        const backendUrl = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "https://api.kombingo.com"
         const publishableKey = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY
         const headers: Record<string, string> = {}
         if (publishableKey) {
@@ -152,16 +172,27 @@ export default function ProductActions({
           
           setBtnConfig({
             buy_now_enabled: data.config.buy_now_enabled ?? true,
+            buy_now_text: data.config.buy_now_text || "HEMEN AL",
             buy_now_bg: data.config.buy_now_bg || "#E50000",
             buy_now_text_color: data.config.buy_now_text_color || "#ffffff",
             add_to_cart_enabled: data.config.add_to_cart_enabled ?? true,
+            add_to_cart_text: data.config.add_to_cart_text || "SEPETE EKLE",
             add_to_cart_bg: data.config.add_to_cart_bg || "#000000",
             add_to_cart_text_color: data.config.add_to_cart_text_color || "#ffffff",
             whatsapp_enabled: data.config.whatsapp_enabled ?? true,
+            whatsapp_text: data.config.whatsapp_text || "WHATSAPP İLE SİPARİŞ",
             whatsapp_number: data.config.whatsapp_number || "905323370081",
             whatsapp_bg: data.config.whatsapp_bg || "#ffffff",
             whatsapp_text_color: data.config.whatsapp_text_color || "#25D366",
+            button_border_radius: data.config.button_border_radius || "0px",
           })
+
+          if (data.config.product_detail_settings) {
+            setDetailConfig((prev) => ({
+              ...prev,
+              ...data.config.product_detail_settings,
+            }))
+          }
         }
       } catch (err) {
         console.error("Failed to fetch scrolling text in product-actions:", err)
@@ -236,15 +267,33 @@ export default function ProductActions({
         return v.options?.every((opt: any) => {
           if (renkOption && opt.option_id === renkOption.id) {
             if (!urlRenk) return true
-            return opt.value?.toLowerCase() === urlRenk.toLowerCase()
+            return opt.value?.trim().toLowerCase() === urlRenk.trim().toLowerCase()
           }
           if (bedenOption && opt.option_id === bedenOption.id) {
             if (!urlBeden) return true
-            return opt.value?.toLowerCase() === urlBeden.toLowerCase()
+            return opt.value?.trim().toLowerCase() === urlBeden.trim().toLowerCase()
           }
           return true
         })
       })
+      
+      // Fallback 1: Try to match JUST the Color (Renk)
+      if (!matchedVariant && urlRenk && renkOption) {
+        matchedVariant = product.variants.find((v) => {
+          return v.options?.some((opt: any) => {
+            return opt.option_id === renkOption.id && opt.value?.trim().toLowerCase() === urlRenk.trim().toLowerCase()
+          })
+        })
+      }
+      
+      // Fallback 2: Try to match JUST the Size (Beden)
+      if (!matchedVariant && urlBeden && bedenOption) {
+        matchedVariant = product.variants.find((v) => {
+          return v.options?.some((opt: any) => {
+            return opt.option_id === bedenOption.id && opt.value?.trim().toLowerCase() === urlBeden.trim().toLowerCase()
+          })
+        })
+      }
     }
 
     // If no variant matches the URL params, or URL params not specified
@@ -352,11 +401,17 @@ export default function ProductActions({
     setIsAdding(true)
 
     try {
-      await addToCart({
+      const error = await addToCart({
         variantId: selectedVariant.id,
         quantity: 1,
         countryCode,
       })
+
+      if (error) {
+        alert("Ürün sepete eklenirken bir hata oluştu. Lütfen sayfayı yenileyip tekrar deneyin.")
+        setIsAdding(false)
+        return
+      }
 
       if (selectedGiftVariantId) {
         const { addGiftToCart } = await import("@lib/data/cart")
@@ -396,7 +451,7 @@ export default function ProductActions({
         setIsAdded(false)
       }, 1500)
     } catch (e: any) {
-      alert("Ürün sepete eklenirken bir hata oluştu. " + (e?.message?.includes("inventory") ? "Ürün stokta kalmamış olabilir." : (e?.message || "")))
+      alert("Ürün sepete eklenirken bir hata oluştu. Lütfen sayfayı yenileyip tekrar deneyin.")
     } finally {
       setIsAdding(false)
     }
@@ -409,11 +464,17 @@ export default function ProductActions({
     setIsBuyingNow(true)
 
     try {
-      await addToCart({
+      const error = await addToCart({
         variantId: selectedVariant.id,
         quantity: 1,
         countryCode,
       })
+
+      if (error) {
+        alert("Hemen al işlemi başlatılamadı. Lütfen sayfayı yenileyip tekrar deneyin.")
+        setIsBuyingNow(false)
+        return
+      }
 
       if (selectedPrice) {
         trackAddToCart({
@@ -429,7 +490,7 @@ export default function ProductActions({
 
       router.push(`/${countryCode}/cart`)
     } catch (e: any) {
-      alert("Hemen al işlemi başlatılamadı. " + (e?.message?.includes("inventory") ? "Ürün stokta kalmamış olabilir." : (e?.message || "")))
+      alert("Hemen al işlemi başlatılamadı. Lütfen sayfayı yenileyip tekrar deneyin.")
     } finally {
       setIsBuyingNow(false)
     }
@@ -582,12 +643,14 @@ export default function ProductActions({
           )}
 
           {/* Live view count */}
-          <div className="flex items-center gap-x-3 bg-gray-50 border border-gray-200 px-4 py-3 text-sm text-black mt-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse shrink-0"></span>
-            <span className="tracking-wide">
-              Şu an <strong>{viewerCount} kişi</strong> bu ürünü inceliyor.
-            </span>
-          </div>
+          {detailConfig.show_live_viewers !== false && (
+            <div className="flex items-center gap-x-3 bg-gray-50 border border-gray-200 px-4 py-3 text-sm text-black mt-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse shrink-0"></span>
+              <span className="tracking-wide">
+                Şu an <strong>{viewerCount} kişi</strong> bu ürünü inceliyor.
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Trendyol Style Coupon Badge */}
@@ -707,10 +770,14 @@ export default function ProductActions({
                 isBuyingNow ||
                 !isValidVariant
               }
-              className="w-full h-14 uppercase tracking-widest text-[15px] transition-opacity border-none rounded-none font-bold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center hover:opacity-90"
-              style={{ backgroundColor: btnConfig.buy_now_bg, color: btnConfig.buy_now_text_color }}
+              className="w-full h-14 uppercase tracking-widest text-[15px] transition-opacity border-none font-bold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center hover:opacity-90"
+              style={{
+                backgroundColor: btnConfig.buy_now_bg,
+                color: btnConfig.buy_now_text_color,
+                borderRadius: btnConfig.button_border_radius || "0px",
+              }}
             >
-              {isBuyingNow ? "Satın Alınıyor..." : "HEMEN AL"}
+              {isBuyingNow ? "Satın Alınıyor..." : btnConfig.buy_now_text || "HEMEN AL"}
             </button>
           )}
 
@@ -726,7 +793,7 @@ export default function ProductActions({
                 isBuyingNow ||
                 !isValidVariant
               }
-              className={`w-full h-14 uppercase tracking-widest text-[15px] transition-all duration-300 border-none rounded-none font-bold flex items-center justify-center hover:opacity-90 ${
+              className={`w-full h-14 uppercase tracking-widest text-[15px] transition-all duration-300 border-none font-bold flex items-center justify-center hover:opacity-90 ${
                 !inStock || !isValidVariant || !selectedVariant || disabled
                   ? "bg-zinc-200 text-zinc-400 cursor-not-allowed opacity-50"
                   : isAdded
@@ -735,8 +802,12 @@ export default function ProductActions({
               }`}
               style={
                 !(!inStock || !isValidVariant || !selectedVariant || disabled) && !isAdded
-                  ? { backgroundColor: btnConfig.add_to_cart_bg, color: btnConfig.add_to_cart_text_color }
-                  : undefined
+                  ? {
+                      backgroundColor: btnConfig.add_to_cart_bg,
+                      color: btnConfig.add_to_cart_text_color,
+                      borderRadius: btnConfig.button_border_radius || "0px",
+                    }
+                  : { borderRadius: btnConfig.button_border_radius || "0px" }
               }
               data-testid="add-product-button"
             >
@@ -748,7 +819,7 @@ export default function ProductActions({
                 ? "EKLENİYOR..."
                 : isAdded
                 ? "EKLENDİ ✔"
-                : "SEPETE EKLE"}
+                : btnConfig.add_to_cart_text || "SEPETE EKLE"}
             </button>
           )}
 
@@ -758,39 +829,41 @@ export default function ProductActions({
               href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full h-14 flex items-center justify-center gap-x-2 uppercase tracking-widest text-sm font-bold transition-opacity hover:opacity-90 border rounded-none"
+              className="w-full h-14 flex items-center justify-center gap-x-2 uppercase tracking-widest text-sm font-bold transition-opacity hover:opacity-90 border"
               style={{
                 backgroundColor: btnConfig.whatsapp_bg,
                 color: btnConfig.whatsapp_text_color,
-                borderColor: btnConfig.whatsapp_text_color
+                borderColor: btnConfig.whatsapp_text_color,
+                borderRadius: btnConfig.button_border_radius || "0px",
               }}
             >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
-            </svg>
-            WHATSAPP İLE SİPARİŞ
-          </a>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
+              </svg>
+              {btnConfig.whatsapp_text || "WHATSAPP İLE SİPARİŞ"}
+            </a>
           )}
 
-
           {/* Secure / Shipping Info */}
-          <div className="flex items-center justify-center gap-x-6 mt-4 opacity-70">
-            <div className="flex items-center gap-x-2 text-[11px] uppercase tracking-wide font-medium">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-              </svg>
-              Güvenli Ödeme
+          {detailConfig.show_trust_row !== false && (
+            <div className="flex items-center justify-center gap-x-6 mt-4 opacity-70">
+              <div className="flex items-center gap-x-2 text-[11px] uppercase tracking-wide font-medium">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+                {detailConfig.trust_badge_1_text || "Güvenli Ödeme"}
+              </div>
+              <div className="flex items-center gap-x-2 text-[11px] uppercase tracking-wide font-medium">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <rect x="1" y="3" width="15" height="13" rx="2" ry="2" />
+                  <path d="M16 8h4l3 3v5h-7V8z" />
+                  <circle cx="5.5" cy="18.5" r="2.5" />
+                  <circle cx="16.5" cy="18.5" r="2.5" />
+                </svg>
+                {detailConfig.trust_badge_2_text || "Aynı Gün Kargo"}
+              </div>
             </div>
-            <div className="flex items-center gap-x-2 text-[11px] uppercase tracking-wide font-medium">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <rect x="1" y="3" width="15" height="13" rx="2" ry="2" />
-                <path d="M16 8h4l3 3v5h-7V8z" />
-                <circle cx="5.5" cy="18.5" r="2.5" />
-                <circle cx="16.5" cy="18.5" r="2.5" />
-              </svg>
-              Aynı Gün Kargo
-            </div>
-          </div>
+          )}
         </div>
 
         {children}
@@ -886,10 +959,14 @@ export default function ProductActions({
                 <div className="text-sm text-gray-600 leading-relaxed font-light">
                   <div className="space-y-4 text-[#444] text-[15px]">
                     <p>
-                      <strong className="text-black font-medium">Aynı Gün Kargo:</strong> Saat 15:00&apos;a kadar verilen tüm siparişleriniz aynı gün kargoya teslim edilmektedir. Teslimat süresi ortalama 1-3 iş günüdür.
+                      <strong className="text-black font-medium">Aynı Gün Kargo:</strong>{" "}
+                      {detailConfig.shipping_info_text ||
+                        "Saat 15:00'a kadar verilen tüm siparişleriniz aynı gün kargoya teslim edilmektedir. Teslimat süresi ortalama 1-3 iş günüdür."}
                     </p>
                     <p>
-                      <strong className="text-black font-medium">Kolay İade:</strong> Siparişinizdeki ürünleri teslim aldığınız tarihten itibaren 14 gün içerisinde, kullanılmamış ve etiketleri sökülmemiş olması şartıyla iade edebilirsiniz.
+                      <strong className="text-black font-medium">Kolay İade:</strong>{" "}
+                      {detailConfig.return_policy_text ||
+                        "Siparişinizdeki ürünleri teslim aldığınız tarihten itibaren 14 gün içerisinde, kullanılmamış ve etiketleri sökülmemiş olması şartıyla iade edebilirsiniz."}
                     </p>
                   </div>
                 </div>
@@ -899,17 +976,19 @@ export default function ProductActions({
           <div className="border-t border-gray-200"></div>
         </div>
 
-        <MobileActions
-          product={product}
-          variant={selectedVariant}
-          options={options}
-          updateOptions={setOptionValue}
-          inStock={inStock}
-          handleAddToCart={handleAddToCart}
-          isAdding={isAdding}
-          show={!inView}
-          optionsDisabled={!!disabled || isAdding || isBuyingNow}
-        />
+        {detailConfig.show_sticky_mobile_bar !== false && (
+          <MobileActions
+            product={product}
+            variant={selectedVariant}
+            options={options}
+            updateOptions={setOptionValue}
+            inStock={inStock}
+            handleAddToCart={handleAddToCart}
+            isAdding={isAdding}
+            show={!inView}
+            optionsDisabled={!!disabled || isAdding || isBuyingNow}
+          />
+        )}
       </div>
 
       {/* Coupon Modal */}
